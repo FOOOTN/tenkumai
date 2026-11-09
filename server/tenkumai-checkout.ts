@@ -1,9 +1,9 @@
-// 天空米：商品の取得・注文の受付・カード決済（サイトの index.html / checkout.html から呼ぶ）
+// 天空米：商品の取得・注文の受付・カード決済・お問い合わせ（サイトの index.html / checkout.html から呼ぶ）
 // Supabase Edge Function「tenkumai-checkout」（JWT 確認オフ：ログインなしのお客さんが使うため）
 // 決済：Stripe Connect のデスティネーション支払い（支払額の5%が運営者＝照櫟VorDX、残りが販売者＝富山商会）
 // Secrets：TENKU_STRIPE_SECRET_KEY・TENKU_SELLER_ACCOUNT_ID・TENKU_SITE_URL（任意）
 //          メール通知（任意）：TENKU_RESEND_API_KEY・TENKU_MAIL_FROM・TENKU_NOTIFY_TO（カンマ区切り）
-// データ：public.tenkumai_products / tenkumai_orders / tenkumai_news（service role でのみ読み書き）
+// データ：public.tenkumai_products / tenkumai_orders / tenkumai_news / tenkumai_contacts（service role でのみ読み書き）
 import Stripe from "npm:stripe@17.7.0";
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
@@ -61,6 +61,18 @@ Deno.serve(async (req) => {
       ]);
       if (e1 || e2) throw new Error((e1 || e2)!.message);
       return json({ products, news });
+    }
+
+    // ---- お問い合わせ（天空米のロゴから） ----
+    if (action === "contact") {
+      const t = (v: unknown, n: number) => String(v ?? "").trim().slice(0, n);
+      const row = { kind: t(body.kind, 40) || "その他", name: t(body.name, 60), mail: t(body.mail, 120), tel: t(body.tel, 20) || null, body: t(body.body, 2000) };
+      if (!row.name || !row.body || !/^[^@\s]+@[^@\s]+$/.test(row.mail)) return json({ error: "お名前・メールアドレス・内容を入力してください" }, 400);
+      const { error } = await db.from("tenkumai_contacts").insert(row);
+      if (error) throw new Error(error.message);
+      const staff = (Deno.env.get("TENKU_NOTIFY_TO") || "").split(",").map((x) => x.trim());
+      await sendMail(staff, `天空米へのお問い合わせ（${row.kind}）`, `お名前：${row.name}\nメール：${row.mail}\n電話：${row.tel || "なし"}\n\n${row.body}`).catch(() => {});
+      return json({ ok: true });
     }
 
     if (action !== "order") return json({ error: "不明な操作です" }, 400);

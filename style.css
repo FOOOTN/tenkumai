@@ -14,12 +14,7 @@ img{max-width:100%}
   --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
   --f-pixel:"DotGothic16","MS Gothic","Osaka-mono",monospace;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#111915; --surface:#18221C; --ink:#E5EADF; --muted:#9BA99E; --line:#2D3B32;
-  --gold:#E2B653; --indigo:#93B6DA; --leaf:#8EC292; --chip:#223028; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#111915; --surface:#18221C; --ink:#E5EADF; --muted:#9BA99E; --line:#2D3B32;
-  --gold:#E2B653; --indigo:#93B6DA; --leaf:#8EC292; --chip:#223028; color-scheme:dark}
+/* 販売サイトは明るい配色に固定（写真・ラベルに合わせる）。村の地図だけは別の暗い配色 */
 
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.85;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -327,3 +322,23 @@ a.checkout[aria-disabled="true"]{background:var(--line);color:var(--muted);curso
 .newsbar b{font-size:.74rem;letter-spacing:.14em;color:var(--leaf)}
 .pcard.soldout .pimg{opacity:.45}
 .pcard .add:disabled{background:var(--line);color:var(--muted);cursor:not-allowed}
+
+/* 行事名と時期を横並びに */
+.steps .sub > span{display:flex;flex-wrap:wrap;gap:0 .5em;align-items:baseline}
+.steps .sub i{display:inline;font-style:normal;color:var(--muted)}
+.act ul.mini{margin:8px 0 0;padding-left:1.1em;color:var(--muted);font-size:.9rem}
+.act ul.mini b{color:var(--ink);font-weight:700}
+/* お問い合わせ */
+.logo-btn{all:unset;cursor:pointer;display:block}
+.logo-btn:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+.logo-btn .hint{display:block;font-family:var(--f-body);font-size:.78rem;font-weight:500;color:var(--leaf);letter-spacing:.06em;margin-top:2px}
+.modal{position:fixed;inset:0;background:rgba(20,28,22,.55);display:flex;align-items:center;justify-content:center;z-index:30;padding:16px}
+.modal[hidden]{display:none!important}
+.mbox{background:var(--surface);color:var(--ink);width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:24px;border:1px solid var(--line)}
+.mbox h2{font-size:1.4rem}
+.mbox p.lead{color:var(--muted);font-size:.88rem;margin-top:6px}
+.mbox label{display:block;font-size:.85rem;font-weight:700;margin-top:12px}
+.mbox input,.mbox select,.mbox textarea{font:inherit;font-size:.95rem;width:100%;padding:9px 10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin-top:4px}
+.mbox .row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.mbox .bad{border-color:#b03a2e}
+.k-btn{font:inherit;font-size:.85rem;font-weight:700;border:1px solid var(--ink);background:transparent;color:var(--ink);padding:6px 12px;cursor:pointer}

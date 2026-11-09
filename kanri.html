@@ -80,6 +80,7 @@
       <button type="button" role="tab" data-tab="orders" aria-selected="true">注文</button>
       <button type="button" role="tab" data-tab="products" aria-selected="false">商品</button>
       <button type="button" role="tab" data-tab="news" aria-selected="false">お知らせ</button>
+      <button type="button" role="tab" data-tab="contacts" aria-selected="false">お問い合わせ</button>
       <button type="button" role="tab" data-tab="report" aria-selected="false">売上と手数料</button>
     </div>
 
@@ -109,6 +110,11 @@
       <div class="news-add"><textarea id="newsBody" placeholder="例：令和8年産の新米、受付を始めました。" maxlength="300" aria-label="お知らせの本文"></textarea><button type="button" class="k-btn solid" id="newsAdd">お知らせを追加</button></div>
       <p class="fine" style="margin:8px 0 12px">公開中のお知らせのうち、新しい2件が天空米のページに表示されます。</p>
       <div id="newsList"></div>
+    </section>
+
+    <section class="panel" data-panel="contacts" hidden>
+      <div class="bar"><label for="cShow">表示</label><select id="cShow"><option value="new">未対応</option><option value="">すべて</option><option value="done">対応済み</option></select></div>
+      <div id="contactList"></div>
     </section>
 
     <section class="panel" data-panel="report" hidden>
@@ -158,7 +164,7 @@ async function start(){
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
   document.querySelectorAll('.panel').forEach(p=>p.hidden=p.dataset.panel!==b.dataset.tab);
-  ({orders:loadOrders,products:loadProducts,news:loadNews,report:loadReport})[b.dataset.tab]();
+  ({orders:loadOrders,products:loadProducts,news:loadNews,contacts:loadContacts,report:loadReport})[b.dataset.tab]();
 });
 
 /* ---- 注文 ---- */
@@ -233,6 +239,24 @@ async function loadNews(){
 }
 $('newsAdd').onclick=async()=>{ const v=$('newsBody').value.trim(); if(!v){ toast('本文を入力してください'); return; }
   try{ await call('news_add',{body:v}); $('newsBody').value=''; toast('追加しました'); loadNews(); }catch(x){ toast(x.message); } };
+
+/* ---- お問い合わせ ---- */
+async function loadContacts(){
+  const box=$('contactList'); box.innerHTML='<p class="empty">読み込んでいます…</p>';
+  try{
+    let {contacts}=await call('contacts'); const f=$('cShow').value; if(f) contacts=contacts.filter(c=>c.status===f);
+    if(!contacts.length){ box.innerHTML='<p class="empty">該当するお問い合わせはありません。</p>'; return; }
+    box.innerHTML='';
+    contacts.forEach(c=>{ const el=document.createElement('article'); el.className='ord';
+      el.innerHTML=`<div><h3>${esc(c.kind)} <span class="chip ${c.status==='done'?'st-shipped':'st-received'}">${c.status==='done'?'対応済み':'未対応'}</span></h3>
+        <div class="meta">${new Date(c.created_at).toLocaleString('ja-JP')}</div><p style="margin-top:8px;white-space:pre-wrap;font-size:.9rem">${esc(c.body)}</p></div>
+        <div class="addr"><b>${esc(c.name)}</b> 様<br>${esc(c.mail)}${c.tel?'<br>電話 '+esc(c.tel):''}</div><div class="acts"></div>`;
+      const b=document.createElement('button'); b.type='button'; b.className='k-btn '+(c.status==='done'?'':'solid'); b.textContent=c.status==='done'?'未対応に戻す':'対応済みにする';
+      b.onclick=async()=>{ try{ await call('contact_update',{id:c.id,status:c.status==='done'?'new':'done'}); toast('更新しました'); loadContacts(); }catch(x){ toast(x.message); } };
+      el.querySelector('.acts').appendChild(b); box.appendChild(el); });
+  }catch(x){ box.innerHTML='<p class="k-err">'+esc(x.message)+'</p>'; }
+}
+$('cShow').onchange=loadContacts;
 
 /* ---- 売上と手数料 ---- */
 const now=new Date(); $('rMonth').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');

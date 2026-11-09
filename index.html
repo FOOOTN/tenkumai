@@ -22,13 +22,13 @@
   <div class="shop-hero">
     <div class="sh-text">
       <div class="eyebrow">富山市八尾町 ・ 天空の田んぼ</div>
-      <h1>天空米</h1>
+      <button type="button" class="logo-btn" id="logoBtn" aria-haspopup="dialog"><h1>天空米</h1><span class="hint">お問い合わせはこちら</span></button>
       <p class="hero-sub">八尾の山里の恵み</p>
-      <p class="sh-lead">地域でいちばん高い場所にある田んぼで、用水の1番水を使い、農薬も肥料も使わずに育てたお米です。田植えから天日干しまで人の手で、ゆっくり育った天空米を、田んぼから直接お届けします。</p>
+      <p class="sh-lead">地域でいちばん高い場所にある田んぼで、用水の1番水を使い、農薬も肥料も使わずに育てたお米です。田植えから稲架掛け（天日干し）まで人の手で、ゆっくり育った天空米を、田んぼから直接お届けします。</p>
       <div class="newsbar" id="news" hidden></div>
       <p class="hero-links"><a href="#shop">天空米を選ぶ ↓</a><a href="about.html">天空米の村について →</a><a href="activity.html">天空米ができるまで →</a></p>
     </div>
-    <figure class="sh-photo"><img src="bag-hero.jpg" alt="天空米のラベルを貼ったササシグレと古代米黒米の米袋"><figcaption>写真はイメージです</figcaption></figure>
+    <figure class="sh-photo"><img class="logo-img" style="cursor:pointer" title="お問い合わせ" src="bag-hero.jpg" alt="天空米のラベルを貼ったササシグレと古代米黒米の米袋"><figcaption>写真はイメージです</figcaption></figure>
   </div>
 </div>
 <section class="tanbo-sec">
@@ -191,5 +191,46 @@ if(window.TENKU&&TENKU.api){
 })();
 </script>
 
+<div class="modal" id="contact" hidden role="dialog" aria-modal="true" aria-labelledby="ct-h">
+  <form class="mbox" id="ctForm" novalidate>
+    <h2 id="ct-h">お問い合わせ</h2>
+    <p class="lead">天空米や体験について、お気軽にどうぞ。富山商会・村の音からお返事します。</p>
+    <label for="ct-kind">内容</label>
+    <select id="ct-kind" name="kind"><option>天空米について</option><option>体験について</option><option>法人・ギフトのご相談</option><option>取材・その他</option></select>
+    <label for="ct-name">お名前</label><input id="ct-name" name="name" autocomplete="name" required>
+    <label for="ct-mail">メールアドレス</label><input id="ct-mail" name="mail" type="email" autocomplete="email" required>
+    <label for="ct-tel">電話番号（任意）</label><input id="ct-tel" name="tel" type="tel" autocomplete="tel">
+    <label for="ct-body">お問い合わせ内容</label><textarea id="ct-body" name="body" rows="5" maxlength="2000" required></textarea>
+    <p class="co-err" id="ctErr" hidden></p>
+    <div class="row"><button type="button" class="k-btn" id="ctClose">閉じる</button><button type="submit" class="add" id="ctSend" style="padding:8px 18px">送信する</button></div>
+  </form>
+  <div class="mbox" id="ctDone" hidden><h2>送信しました</h2><p class="lead">お問い合わせありがとうございます。内容を確認して、メールでお返事します。</p><div class="row"><button type="button" class="add" id="ctOk" style="padding:8px 18px">閉じる</button></div></div>
+</div>
+<script>
+(function(){
+const m=document.getElementById('contact'), f=document.getElementById('ctForm'), done=document.getElementById('ctDone'), err=document.getElementById('ctErr');
+let last=null;
+const open=()=>{ last=document.activeElement; f.hidden=false; done.hidden=true; err.hidden=true; m.hidden=false; document.getElementById('ct-kind').focus(); };
+const close=()=>{ m.hidden=true; if(last) last.focus(); };
+document.getElementById('logoBtn').onclick=open;
+document.querySelector('.logo-img').onclick=open;
+document.getElementById('ctClose').onclick=close; document.getElementById('ctOk').onclick=close;
+m.addEventListener('click',e=>{ if(e.target===m) close(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!m.hidden) close(); });
+f.addEventListener('submit',async e=>{
+  e.preventDefault(); err.hidden=true;
+  const req=[...f.querySelectorAll('[required]')], bad=req.filter(i=>!i.value.trim()||(i.type==='email'&&!/^[^@\s]+@[^@\s]+$/.test(i.value)));
+  req.forEach(i=>i.classList.toggle('bad',bad.includes(i)));
+  if(bad.length){ err.textContent='赤い枠の項目を入力してください。'; err.hidden=false; bad[0].focus(); return; }
+  const btn=document.getElementById('ctSend'); btn.disabled=true; btn.textContent='送信しています…';
+  try{
+    const r=await fetch(TENKU.api+'/tenkumai-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'contact',...Object.fromEntries(new FormData(f))})});
+    const j=await r.json(); if(!r.ok||j.error) throw new Error(j.error||'送信できませんでした');
+    f.reset(); f.hidden=true; done.hidden=false; document.getElementById('ctOk').focus();
+  }catch(x){ err.textContent='送信できませんでした（'+x.message+'）。時間をおいてもう一度お試しください。'; err.hidden=false; }
+  finally{ btn.disabled=false; btn.textContent='送信する'; }
+});
+})();
+</script>
 </body>
 </html>

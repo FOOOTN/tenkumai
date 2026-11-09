@@ -66,6 +66,14 @@ Deno.serve(async (req) => {
       const { data, error } = await db.from("tenkumai_news").update(patch).eq("id", Number(b.id)).select().single(); must(error); return json({ item: data }); }
     if (a === "news_delete") { const { error } = await db.from("tenkumai_news").delete().eq("id", Number(b.id)); must(error); return json({ ok: true }); }
 
+    if (a === "contacts") { const { data, error } = await db.from("tenkumai_contacts").select("*").order("created_at", { ascending: false }).limit(200); must(error); return json({ contacts: data }); }
+    if (a === "contact_update") {
+      const patch: Record<string, unknown> = {};
+      if (b.status !== undefined) { if (!["new", "done"].includes(String(b.status))) return json({ error: "状態が正しくありません" }, 400); patch.status = b.status; }
+      if (b.memo !== undefined) patch.memo = String(b.memo).slice(0, 500);
+      const { data, error } = await db.from("tenkumai_contacts").update(patch).eq("id", Number(b.id)).select().single(); must(error); return json({ item: data });
+    }
+
     return json({ error: "不明な操作です" }, 400);
   } catch (e) {
     return json({ error: String((e as Error).message || e) }, 400);

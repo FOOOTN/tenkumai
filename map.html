@@ -257,7 +257,9 @@ function say(name,lines,acts,lucky){
 function addLine(s,lucky){ full+='\n'+s; typeOn(); flash(lucky); }
 function pick(list){ const sum=list.reduce((a,b)=>a+b[1],0); let r=Math.random()*sum; for(const it of list){ r-=it[1]; if(r<0) return it[0]; } return list[0][0]; }
 function addCatch(cat,name){ caught[cat][name]=(caught[cat][name]||0)+1; store.set('caught',caught); renderZukan(); }
-function lottery(){ if(coupons<3&&Math.random()<0.2){ coupons++; store.set('coupons',coupons); renderTickets(); sfx('fanfare'); return '★ あたり！ 100円のわりびきけんを手に入れた！（'+coupons+'/3枚）'; } return null; }
+/* 当たりは前回からおよそ1分たってから、出る機会があるたびに半分の確率で出る */
+let lastWin=Date.now();
+function lottery(){ if(coupons<3&&Date.now()-lastWin>=60000&&Math.random()<0.5){ lastWin=Date.now(); coupons++; store.set('coupons',coupons); renderTickets(); sfx('fanfare'); return '★ あたり！ 100円のわりびきけんを手に入れた！（'+coupons+'/3枚）'; } return null; }
 
 const EVENTS={
   mt:[GAME,['山の奥で、けものの足あとを見つけた……','……息をひそめて、あとを追う。'],n=>'猟師といっしょに、'+n+'をつかまえた！'],
@@ -277,6 +279,10 @@ function visit(p){
   current=p; highlight(p);
   if(busy) return;
   if(p===BOAT) return board();
+  if((p.id==='shuryo'&&!done('mt'))||(p.id==='keiryu'&&!done('river'))){
+    if(!encOk()) return say(p.name,[p.id==='shuryo'?'いまは獣の気配がない。':'いまは魚の気配がない。','少し時間をおいて、また来てみよう。'],p.acts);
+    lastEnc=Date.now();
+  }
   if(p.id==='shuryo') return done('mt')?say(p.name,['山の獲物は、ぜんぶずかんにのった。','もう、けものは現れない。'],p.acts):catchEvent('mt',p.name,p.acts);
   if(p.id==='keiryu') return done('river')?say(p.name,['川の魚は、ぜんぶ釣りあげた。','もう、魚はかからない。'],p.acts):catchEvent('river',p.name,p.acts);
   let lines, name=p.name;
@@ -300,12 +306,15 @@ function disembark(){
   if(lt) setTarget(lt[0],lt[1],true);
 }
 function placeBoatTag(){ const tg=btns.himi[0]; tg.style.left=((BOAT.x+.5)/W*100)+'%'; tg.style.top=((BOAT.y-.1)/H*100)+'%'; }
+/* 獣や魚に出会う間隔：前回の出会いから少なくとも20秒あける */
+let lastEnc=0;
+const encOk=()=>Date.now()-lastEnc>=20000;
 function onStep(x,y,prevC){
-  if(mode==='boat'){ if(!busy&&!done('sea')&&Math.hypot(x-MOOR[0],y-MOOR[1])>2.5&&Math.random()<0.12) catchEvent('sea','富山湾',['富山湾で海釣り']); return; }
+  if(mode==='boat'){ if(!busy&&!done('sea')&&Math.hypot(x-MOOR[0],y-MOOR[1])>2.5&&encOk()&&Math.random()<0.06){ lastEnc=Date.now(); catchEvent('sea','富山湾',['富山湾で海釣り']); } return; }
   const c=MAP[y][x];
   if(c==='~'&&prevC!=='~'&&!busy&&!current){ say('ざぶーん！',['仲間は海に入った。','4人とも、ずぶぬれだ！'],[]); sfx('splash'); }
   if(current||busy) return;
-  if((c==='^'||c==='T')&&!done('mt')&&Math.random()<0.09) catchEvent('mt','狩猟',['狩猟体験（猟師に同行）']);
+  if((c==='^'||c==='T')&&!done('mt')&&encOk()&&Math.random()<0.04){ lastEnc=Date.now(); catchEvent('mt','狩猟',['狩猟体験（猟師に同行）']); }
 }
 
 /* ---- tags, commands, HUD ---- */
