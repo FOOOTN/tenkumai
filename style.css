@@ -102,7 +102,7 @@ section{padding-block:56px;border-top:1px solid var(--line)}
 .rice{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:40px;align-items:start}
 .rice h3,.act h3{font-size:1.35rem}
 .rice .intro p{color:var(--muted);font-size:.95rem;margin-top:10px}
-.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--line);background:var(--surface)}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border:1px solid var(--line);background:var(--surface)}
 .steps li{padding:16px 12px;border-right:1px solid var(--line);min-width:0}
 .steps li:last-child{border-right:0}
 .steps .n{font-family:var(--f-display);font-weight:800;color:var(--gold);font-size:.9rem}
