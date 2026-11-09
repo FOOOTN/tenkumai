@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="style.css?v=20261109f">
+<link rel="stylesheet" href="style.css?v=20261109g">
 </head>
 <body class="page-map">
 <div class="wrap">
@@ -308,13 +308,13 @@ function disembark(){
 function placeBoatTag(){ const tg=btns.himi[0]; tg.style.left=((BOAT.x+.5)/W*100)+'%'; tg.style.top=((BOAT.y-.1)/H*100)+'%'; }
 /* 獣や魚に出会う間隔：前回の出会いから少なくとも20秒あける */
 let lastEnc=0;
-const encOk=()=>Date.now()-lastEnc>=20000;
+const encOk=()=>Date.now()-lastEnc>=12000;
 function onStep(x,y,prevC){
-  if(mode==='boat'){ if(!busy&&!done('sea')&&Math.hypot(x-MOOR[0],y-MOOR[1])>2.5&&encOk()&&Math.random()<0.06){ lastEnc=Date.now(); catchEvent('sea','富山湾',['富山湾で海釣り']); } return; }
+  if(mode==='boat'){ if(!busy&&!done('sea')&&Math.hypot(x-MOOR[0],y-MOOR[1])>2.5&&encOk()&&Math.random()<0.12){ lastEnc=Date.now(); catchEvent('sea','富山湾',['富山湾で海釣り']); } return; }
   const c=MAP[y][x];
   if(c==='~'&&prevC!=='~'&&!busy&&!current){ say('ざぶーん！',['仲間は海に入った。','4人とも、ずぶぬれだ！'],[]); sfx('splash'); }
   if(current||busy) return;
-  if((c==='^'||c==='T')&&!done('mt')&&encOk()&&Math.random()<0.04){ lastEnc=Date.now(); catchEvent('mt','狩猟',['狩猟体験（猟師に同行）']); }
+  if((c==='^'||c==='T')&&!done('mt')&&encOk()&&Math.random()<0.09){ lastEnc=Date.now(); catchEvent('mt','狩猟',['狩猟体験（猟師に同行）']); }
 }
 
 /* ---- tags, commands, HUD ---- */
@@ -332,7 +332,11 @@ PLACES.forEach(p=>{
 function highlight(p){ Object.values(btns).forEach(a=>a.forEach(e=>e.setAttribute('aria-pressed','false'))); if(p) btns[p.id].forEach(e=>e.setAttribute('aria-pressed','true')); }
 function toTile(e){ const r=cv.getBoundingClientRect(); return [Math.floor((e.clientX-r.left)/r.width*W), Math.floor((e.clientY-r.top)/r.height*H)]; }
 stage.addEventListener('pointermove',e=>{ if(e.pointerType!=='mouse')return; const [x,y]=toTile(e); setTarget(x,y); });
-stage.addEventListener('pointerdown',e=>{ if(e.pointerType==='mouse'||e.target!==cv)return; const [x,y]=toTile(e); setTarget(x,y,true); });
+let drag=null;   // スマホ：指でなぞった方向へ歩く（地図やページは動かさない）
+stage.addEventListener('pointerdown',e=>{ if(e.pointerType==='mouse'||e.target!==cv)return; e.preventDefault(); drag=e.pointerId; try{cv.setPointerCapture(e.pointerId)}catch(_){} const [x,y]=toTile(e); setTarget(x,y,true); });
+cv.addEventListener('pointermove',e=>{ if(e.pointerType==='mouse'||drag!==e.pointerId)return; e.preventDefault(); const [x,y]=toTile(e); setTarget(Math.max(0,Math.min(W-1,x)),Math.max(0,Math.min(H-1,y))); });
+['pointerup','pointercancel'].forEach(ev=>cv.addEventListener(ev,e=>{ if(drag===e.pointerId) drag=null; }));
+cv.addEventListener('touchmove',e=>{ if(drag!==null) e.preventDefault(); },{passive:false});
 stage.addEventListener('keydown',e=>{
   const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key]; if(!d)return; e.preventDefault();
   const x=Math.floor(L.x/T)+d[0], y=Math.floor(L.y/T)+d[1]; if(walkable(x,y)) setTarget(x,y,true);
