@@ -367,8 +367,15 @@ a.checkout[aria-disabled="true"]{background:var(--line);color:var(--muted);curso
 @media (max-width:1100px) and (min-width:761px){ .steps-season .sbox .w{font-size:1.2rem} }
 @media (max-width:760px){
   .steps-season{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .steps-season li{display:flex;flex-direction:column;flex-wrap:nowrap;align-items:stretch;border-bottom:1px solid var(--line)}
+  .steps-season li{border-bottom:1px solid var(--line)}
   .steps-season li:nth-child(odd){border-right:1px solid var(--line)}
   .steps-season .sbox .w{font-size:1.25rem}
 }
 .steps-season .sbox,.steps-season .sphoto{flex:none}
+
+/* 数字・作業名・時期の位置と、行事の仕切り線の高さを6つでそろえる */
+.steps-season{grid-auto-rows:auto}
+.steps-season li{display:grid;grid-row:span 4;grid-template-rows:subgrid;row-gap:0;align-content:start}
+.steps-season .sbox{justify-content:center}
+.steps-season .sbox .w{min-height:2.44em;display:flex;align-items:center;justify-content:center}
+.steps-season .sub{align-self:stretch}
