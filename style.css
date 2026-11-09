@@ -342,3 +342,33 @@ a.checkout[aria-disabled="true"]{background:var(--line);color:var(--muted);curso
 .mbox .row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
 .mbox .bad{border-color:#b03a2e}
 .k-btn{font:inherit;font-size:.85rem;font-weight:700;border:1px solid var(--ink);background:transparent;color:var(--ink);padding:6px 12px;cursor:pointer}
+
+/* 体験：季節で色が変わる六つの手しごと */
+.steps-season li{display:flex;flex-direction:column;padding:0 0 16px;gap:0;align-items:stretch}
+.steps-season .sbox{aspect-ratio:4/3;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:2px;padding:6px 6px;min-height:0;overflow:hidden;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25);position:relative}
+.steps-season .sbox::after{content:"";position:absolute;inset:0;background:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px) 0 0/4px 4px;pointer-events:none}
+.steps-season .sbox .n{color:inherit;font-size:1.05rem;letter-spacing:.1em;opacity:.92}
+.steps-season .sbox .w{font-size:1.4rem;line-height:1.22;letter-spacing:.06em;word-break:keep-all}
+.steps-season .sbox .m{color:inherit;font-size:.92rem;letter-spacing:.04em;margin-top:4px;opacity:.95}
+.steps-season .s1 .sbox{background:linear-gradient(170deg,#A4C687,#6E9A58)}  /* 春：新緑 */
+.steps-season .s2 .sbox{background:linear-gradient(170deg,#5C8A55,#2E5733)}  /* 夏：濃い緑 */
+.steps-season .s3 .sbox{background:linear-gradient(170deg,#D9B85A,#A98326)}  /* 秋：黄金 */
+.steps-season .s4 .sbox{background:linear-gradient(170deg,#CF8A4E,#9B4F2C)}  /* 秋：紅葉 */
+.steps-season .s5 .sbox{background:linear-gradient(170deg,#AE9671,#73593B)}  /* 晩秋：枯葉 */
+.steps-season .s6 .sbox{background:linear-gradient(170deg,#F7F9FB,#D3DCE4);color:var(--indigo);text-shadow:none}  /* 冬：雪 */
+.steps-season .sphoto{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:var(--chip);border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--muted);font-size:.78rem;letter-spacing:.2em;overflow:hidden}
+.steps-season .sphoto img{width:100%;height:100%;object-fit:cover;display:block}
+.steps-season li > .cap{padding-inline:12px}
+.steps-season .cap{font-size:.84rem;color:var(--ink);line-height:1.7;margin-top:12px}
+.steps-season .sub{margin-inline:12px;padding-inline:0;font-size:.78rem;margin-top:10px;padding-top:8px}
+.steps-season .sub > span{display:block;margin-top:4px;padding-left:1em;text-indent:-1em}
+.steps-season .sub > span::before{content:"・"}
+.steps-season .sub i{display:inline;margin-left:.5em;white-space:nowrap}
+@media (max-width:1100px) and (min-width:761px){ .steps-season .sbox .w{font-size:1.2rem} }
+@media (max-width:760px){
+  .steps-season{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .steps-season li{display:flex;flex-direction:column;flex-wrap:nowrap;align-items:stretch;border-bottom:1px solid var(--line)}
+  .steps-season li:nth-child(odd){border-right:1px solid var(--line)}
+  .steps-season .sbox .w{font-size:1.25rem}
+}
+.steps-season .sbox,.steps-season .sphoto{flex:none}
