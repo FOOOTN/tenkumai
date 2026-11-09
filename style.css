@@ -379,3 +379,11 @@ a.checkout[aria-disabled="true"]{background:var(--line);color:var(--muted);curso
 .steps-season .sbox{justify-content:center}
 .steps-season .sbox .w{min-height:2.44em;display:flex;align-items:center;justify-content:center}
 .steps-season .sub{align-self:stretch}
+
+/* 村の音・富山商会：本文だけの段 */
+.oto-solo{grid-template-columns:minmax(0,1fr)}
+.oto-solo .oto-text{max-width:46em}
+/* フッター：中央そろえ */
+footer{flex-direction:column;align-items:center;text-align:center;gap:10px}
+footer .foot-r{text-align:center;margin-left:0}
+footer .credit{margin-top:6px}
