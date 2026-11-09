@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ご注文手続き</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><a href="index.html">村の音<small>八尾の山里の恵み</small></a></div>
+    <nav aria-label="サイト内"><a href="index.html">天空米</a><a href="about.html">村について</a><a href="map.html">村の地図</a><a href="activity.html">体験</a></nav>
+  </header>
+</div>
+<section>
+  <div class="wrap">
+    <div class="page-head" style="padding-top:0"><h1>ご注文手続き</h1><p>天空米のご注文内容と、お届け先・お支払い方法を入力してください。</p></div>
+    <div class="co-grid">
+      <form id="coForm" class="co-form" novalidate>
+        <fieldset><legend>お届け先</legend>
+          <label for="f-name">お名前<span class="req">必須</span></label><input id="f-name" name="name" autocomplete="name" required>
+          <label for="f-kana">フリガナ</label><input id="f-kana" name="kana">
+          <label for="f-tel">電話番号<span class="req">必須</span></label><input id="f-tel" name="tel" type="tel" autocomplete="tel" required inputmode="tel">
+          <label for="f-mail">メールアドレス<span class="req">必須</span></label><input id="f-mail" name="mail" type="email" autocomplete="email" required>
+          <label for="f-zip">郵便番号<span class="req">必須</span></label><input id="f-zip" name="zip" autocomplete="postal-code" required inputmode="numeric" placeholder="939-2300">
+          <label for="f-addr">ご住所<span class="req">必須</span></label><input id="f-addr" name="addr" autocomplete="street-address" required>
+          <label for="f-time">配達希望時間</label>
+          <select id="f-time" name="time"><option>指定なし</option><option>午前中</option><option>14〜16時</option><option>16〜18時</option><option>18〜20時</option><option>19〜21時</option></select>
+        </fieldset>
+        <fieldset><legend>お支払い方法</legend>
+          <label class="radio"><input type="radio" name="pay" value="card" checked> クレジットカード<small>Visa・Mastercard・JCB・AMEX など</small></label>
+          <label class="radio"><input type="radio" name="pay" value="bank"> 銀行振込（前払い）<small>ご入金を確認してから発送します</small></label>
+          <label class="radio"><input type="radio" name="pay" value="cod"> 代金引換<small>代引き手数料がかかります</small></label>
+        </fieldset>
+        <fieldset><legend>備考</legend>
+          <label for="f-note">のし・贈答などのご要望</label><textarea id="f-note" name="note" rows="3"></textarea>
+        </fieldset>
+        <p class="co-err" id="coErr" hidden></p>
+        <button type="submit" class="co-submit" id="coSubmit">注文を確定する</button>
+        <p class="fine" id="testNote">テストモード：決済サービスがまだつながっていないため、実際の請求や発送は行われません。</p>
+      </form>
+      <aside class="cart co-sum" aria-labelledby="sum-h">
+        <h3 id="sum-h">ご注文内容</h3>
+        <ul id="coList"></ul>
+        <p class="empty" id="coEmpty" hidden>かごが空です。<a href="index.html">天空米を選ぶ</a></p>
+        <table class="sum"><tbody>
+          <tr><td>小計</td><td id="cSub">0円</td></tr>
+          <tr class="disc"><td id="cDiscL">今月のわりびきけん</td><td id="cDisc">−0円</td></tr>
+          <tr><td>送料</td><td id="cShip">確認中</td></tr>
+          <tr class="total"><td>お支払い</td><td id="cTotal">0円</td></tr>
+        </tbody></table>
+        <p class="fine">販売：富山商会。送料は金額が決まりしだい表示します。</p>
+        <p class="cart-note"><a href="index.html">← かごにもどる</a></p>
+      </aside>
+    </div>
+    <div class="co-done" id="coDone" hidden>
+      <h2>ご注文ありがとうございました</h2>
+      <p>注文番号 <b id="orderNo"></b></p>
+      <p id="doneMsg"></p>
+      <p class="fine">テスト環境のため、実際の請求や発送は行われません。</p>
+      <p><a href="index.html">天空米のページへもどる</a></p>
+    </div>
+  </div>
+</section>
+<div class="wrap">
+  <footer>
+    <div>販売 <b>富山商会</b>　／　生産者 <b>NPO法人 村の音</b>　／　協賛 <b>有限会社やしろ館</b></div>
+    <div class="foot-r">試作版（掲載内容は確認中のものを含みます）<span class="credit">制作・運営　<a href="kanri.html">照櫟VorDX</a></span></div>
+  </footer>
+</div>
+<script src="config.js"></script>
+<script>
+(function(){
+const YM=(d=>d.getFullYear()+'-'+(d.getMonth()+1))(new Date());
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let coupons=Math.max(0,Math.min(3,+ls.get('mura_coupons',0)||0));
+if(ls.get('mura_cmonth','')!==YM){ coupons=0; ls.set('mura_coupons',0); ls.set('mura_cmonth',YM); }
+const cart=ls.get('mura_cart',[]).filter(c=>c.sku);
+const yen=n=>n.toLocaleString('ja-JP')+'円';
+const sub=cart.reduce((a,c)=>a+c.price*c.q,0), disc=Math.min(sub,coupons*100);
+const ul=document.getElementById('coList');
+cart.forEach(c=>{ const li=document.createElement('li'); li.innerHTML='<span>'+c.name+'<br><small>'+yen(c.price)+' × '+c.q+'</small></span><span>'+yen(c.price*c.q)+'</span>'; ul.appendChild(li); });
+document.getElementById('coEmpty').hidden=cart.length>0;
+document.getElementById('cSub').textContent=yen(sub);
+document.getElementById('cDiscL').textContent='今月のわりびきけん（'+coupons+'枚）';
+document.getElementById('cDisc').textContent='−'+yen(disc);
+document.getElementById('cTotal').textContent=yen(sub-disc)+'＋送料';
+const TEST=!!(window.TENKU&&TENKU.test);
+document.getElementById('testNote').textContent=TEST?'テスト環境です。カード払いは Stripe のテスト用カード（4242 4242 4242 4242）で試せます。実際の請求や発送は行われません。':'';
+document.getElementById('testNote').hidden=!TEST;
+const done=(no,msg)=>{ document.getElementById('orderNo').textContent=no||''; document.getElementById('doneMsg').textContent=msg;
+  document.querySelector('#coDone .fine').hidden=!TEST; document.querySelector('.co-grid').hidden=true; document.getElementById('coDone').hidden=false; window.scrollTo(0,0); };
+const finish=()=>{ ls.set('mura_cart',[]); const p=ls.get('mura_pending',null); if(p&&p.disc>0) ls.set('mura_coupons',0); ls.set('mura_pending',null); };
+const qs=new URLSearchParams(location.search);
+const err=document.getElementById('coErr');
+if(qs.get('paid')==='1'){ finish(); done(qs.get('order'),'カードのお支払いが完了しました。確認のメールをお送りします。発送の準備ができしだい、富山商会からお届けします。'); }
+if(qs.get('canceled')==='1'){ err.textContent='カードのお支払いを取りやめました。内容を確かめて、もう一度お手続きください。'; err.hidden=false; }
+
+const form=document.getElementById('coForm'), btn=document.getElementById('coSubmit');
+form.addEventListener('submit',async e=>{
+  e.preventDefault(); err.hidden=true;
+  if(!cart.length){ err.textContent='かごが空です。天空米を選んでからお手続きください。'; err.hidden=false; return; }
+  const bad=[...form.querySelectorAll('[required]')].filter(i=>!i.value.trim()||(i.type==='email'&&!/^[^@\s]+@[^@\s]+$/.test(i.value)));
+  form.querySelectorAll('[required]').forEach(i=>i.classList.toggle('bad',bad.includes(i)));
+  if(bad.length){ err.textContent='赤い枠の項目を入力してください。'; err.hidden=false; bad[0].focus(); return; }
+  if(!window.TENKU||!TENKU.api){ err.textContent='注文の受付先が設定されていません。'; err.hidden=false; return; }
+  const fd=Object.fromEntries(new FormData(form));
+  const payload={ action:'order', pay:fd.pay, coupons, note:fd.note||'',
+    items:cart.map(c=>({sku:c.sku,q:c.q})),
+    customer:{name:fd.name,kana:fd.kana,tel:fd.tel,mail:fd.mail,zip:fd.zip,addr:fd.addr,time:fd.time} };
+  btn.disabled=true; btn.textContent='送信しています…';
+  try{
+    const r=await fetch(TENKU.api+'/tenkumai-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const j=await r.json();
+    if(!r.ok||j.error) throw new Error(j.error||'受付できませんでした');
+    if(j.url){ ls.set('mura_pending',{orderNo:j.orderNo,disc}); location.href=j.url; return; }
+    ls.set('mura_pending',{orderNo:j.orderNo,disc}); finish();
+    done(j.orderNo,{bank:'ご注文を受け付けました。振込先をメールでお知らせします。ご入金を確認してから発送します。',cod:'ご注文を受け付けました。商品お届けの際に、代金をお支払いください。'}[fd.pay]||'ご注文を受け付けました。');
+  }catch(x){ err.textContent='ご注文を受け付けられませんでした（'+x.message+'）。時間をおいてもう一度お試しください。'; err.hidden=false; }
+  finally{ btn.disabled=false; btn.textContent='注文を確定する'; }
+});
+})();
+</script>
+</body>
+</html>

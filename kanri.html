@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>天空米 管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+.k-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-block:16px;border-bottom:1px solid var(--line)}
+.k-top .brand small{margin-left:.6em}
+.k-who{font-size:.85rem;color:var(--muted);display:flex;gap:12px;align-items:center}
+.k-btn{font:inherit;font-size:.85rem;font-weight:700;border:1px solid var(--ink);background:transparent;color:var(--ink);padding:6px 12px;cursor:pointer}
+.k-btn.solid{background:var(--ink);color:var(--bg)}
+.k-btn.warn{border-color:#b03a2e;color:#b03a2e}
+.k-btn:disabled{opacity:.5;cursor:not-allowed}
+.login{max-width:420px;margin:72px auto;background:var(--surface);border:1px solid var(--line);padding:28px}
+.login h1{font-size:1.6rem}
+.login p{color:var(--muted);font-size:.9rem;margin-top:8px}
+.login input{font:inherit;width:100%;padding:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin-top:16px}
+.login .k-btn{width:100%;margin-top:12px;padding:10px}
+.k-err{color:#b03a2e;font-size:.88rem;font-weight:700;margin-top:10px}
+.tabs{display:flex;gap:4px;margin-top:20px;border-bottom:2px solid var(--ink);flex-wrap:wrap}
+.tabs button{font:inherit;font-weight:700;border:0;background:transparent;color:var(--muted);padding:10px 16px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--gold)}
+.panel{padding-block:20px 48px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.bar select,.bar input{font:inherit;font-size:.9rem;padding:6px 8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.chip{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.st-pending{background:#f1e6c8;color:#7a5a12}.st-received{background:#dce7f3;color:#244c78}.st-paid{background:#d8ecd9;color:#2a6334}.st-shipped{background:#e4e4e4;color:#444}.st-canceled{background:#f3dcdc;color:#8a2a2a}
+.ord{background:var(--surface);border:1px solid var(--line);padding:16px;margin-bottom:12px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:16px;align-items:start}
+.ord h3{font-family:var(--f-body);font-size:1rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ord .meta{font-size:.8rem;color:var(--muted);margin-top:4px}
+.ord ul{margin:8px 0 0;padding-left:1.1em;font-size:.88rem}
+.ord .tot{font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums}
+.ord .addr{font-size:.86rem;line-height:1.7;min-width:0;word-break:break-word}
+.ord .acts{display:flex;flex-direction:column;gap:6px;min-width:150px}
+.ord .acts input{font:inherit;font-size:.82rem;padding:5px 6px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.ord.test{border-left:4px solid var(--gold)}
+.ptable{width:100%;border-collapse:collapse;font-size:.9rem;min-width:640px}
+.ptable th,.ptable td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:middle}
+.ptable thead th{font-size:.75rem;color:var(--leaf);letter-spacing:.08em}
+.ptable input[type=number]{font:inherit;width:110px;padding:5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-align:right}
+.news-add{display:flex;gap:8px;flex-wrap:wrap}
+.news-add textarea{font:inherit;flex:1 1 320px;min-height:64px;padding:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.nitem{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--line);padding:12px 0;flex-wrap:wrap}
+.nitem p{flex:1 1 300px;min-width:0}
+.nitem .d{font-size:.78rem;color:var(--muted)}
+.nitem .b{display:flex;gap:6px;flex-wrap:wrap}
+.kp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);background:var(--surface);margin-bottom:16px}
+.kp > div{padding:14px;border-right:1px solid var(--line);min-width:0}
+.kp > div:last-child{border-right:0}
+.kp b{display:block;font-size:1.3rem;font-variant-numeric:tabular-nums}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;font-size:.9rem;font-weight:700;z-index:20}
+.empty{color:var(--muted);font-size:.9rem;padding:16px 0}
+@media (max-width:760px){ .ord{grid-template-columns:1fr} .kp{grid-template-columns:repeat(2,minmax(0,1fr))} .kp>div{border-bottom:1px solid var(--line)} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="k-top">
+    <div class="brand">天空米 管理<small>販売：富山商会 ／ 運営：照櫟VorDX</small></div>
+    <div class="k-who" id="who" hidden><span id="roleName"></span><button type="button" class="k-btn" id="logout">ログアウト</button></div>
+  </header>
+
+  <form class="login" id="login">
+    <h1>管理ページ</h1>
+    <p>富山商会・運営者のための、注文と商品の管理ページです。配られた合言葉を入力してください。</p>
+    <label for="key" class="eyebrow" style="display:block;margin-top:16px">合言葉</label>
+    <input id="key" type="password" autocomplete="current-password" required style="margin-top:6px">
+    <button type="submit" class="k-btn solid">入る</button>
+    <p class="k-err" id="loginErr" hidden></p>
+  </form>
+
+  <main id="app" hidden>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="orders" aria-selected="true">注文</button>
+      <button type="button" role="tab" data-tab="products" aria-selected="false">商品</button>
+      <button type="button" role="tab" data-tab="news" aria-selected="false">お知らせ</button>
+      <button type="button" role="tab" data-tab="report" aria-selected="false">売上と手数料</button>
+    </div>
+
+    <section class="panel" data-panel="orders">
+      <div class="bar">
+        <label for="fStatus">表示</label>
+        <select id="fStatus">
+          <option value="todo">対応が必要なもの</option>
+          <option value="">すべて</option>
+          <option value="pending">カード支払い待ち</option>
+          <option value="received">受付（入金待ち・代引き）</option>
+          <option value="paid">支払い済み（発送待ち）</option>
+          <option value="shipped">発送済み</option>
+          <option value="canceled">キャンセル</option>
+        </select>
+        <button type="button" class="k-btn" id="reload">最新にする</button>
+      </div>
+      <div id="orders"></div>
+    </section>
+
+    <section class="panel" data-panel="products" hidden>
+      <p class="fine" style="margin-bottom:12px">価格や売り切れを変えると、すぐにサイトの表示と、お客さんへの請求額に反映されます。</p>
+      <div class="table-wrap"><table class="ptable"><thead><tr><th>商品</th><th>価格（円）</th><th>仮の価格</th><th>売り切れ</th><th>サイトに表示</th><th></th></tr></thead><tbody id="prows"></tbody></table></div>
+    </section>
+
+    <section class="panel" data-panel="news" hidden>
+      <div class="news-add"><textarea id="newsBody" placeholder="例：令和8年産の新米、受付を始めました。" maxlength="300" aria-label="お知らせの本文"></textarea><button type="button" class="k-btn solid" id="newsAdd">お知らせを追加</button></div>
+      <p class="fine" style="margin:8px 0 12px">公開中のお知らせのうち、新しい2件が天空米のページに表示されます。</p>
+      <div id="newsList"></div>
+    </section>
+
+    <section class="panel" data-panel="report" hidden>
+      <div class="bar"><label for="rMonth">対象月</label><input type="month" id="rMonth"></div>
+      <div class="kp">
+        <div><span class="kl">注文数</span><b id="rCount">0件</b></div>
+        <div><span class="kl">売上（お客さんの支払額）</span><b id="rTotal">0円</b></div>
+        <div><span class="kl">運営手数料（5%）</span><b id="rFee" class="feeval">0円</b></div>
+        <div><span class="kl">富山商会の受取額</span><b id="rSeller">0円</b></div>
+      </div>
+      <div class="table-wrap"><table class="ptable"><thead><tr><th>支払い方法</th><th>件数</th><th>売上</th><th>運営手数料</th><th>精算のしかた</th></tr></thead><tbody id="rrows"></tbody></table></div>
+      <p class="fine" style="margin-top:12px">キャンセルとカード支払い待ちの注文は含みません。カード払いの手数料は決済のときに Stripe が自動で分けます。銀行振込・代金引換の手数料は、月末に運営者から富山商会へ請求します。</p>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="config.js"></script>
+<script>
+(function(){
+const API=(window.TENKU&&TENKU.api||'')+'/tenkumai-admin';
+const yen=n=>(+n||0).toLocaleString('ja-JP')+'円';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ST={pending:'カード支払い待ち',received:'受付（入金待ち・代引き）',paid:'支払い済み',shipped:'発送済み',canceled:'キャンセル'};
+const PAY={card:'カード',bank:'銀行振込',cod:'代金引換'};
+let KEY=''; try{ KEY=sessionStorage.getItem('tenku_key')||''; }catch(e){}
+const $=id=>document.getElementById(id);
+function toast(t){ const el=$('toast'); el.textContent=t; el.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>el.hidden=true,2400); }
+async function call(action,data={}){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-tenkumai-key':KEY},body:JSON.stringify({action,...data})});
+  const j=await r.json().catch(()=>({error:'通信に失敗しました'}));
+  if(r.status===401){ logout(); throw new Error(j.error||'合言葉が違います'); }
+  if(!r.ok||j.error) throw new Error(j.error||'うまくいきませんでした');
+  return j;
+}
+function logout(){ KEY=''; try{sessionStorage.removeItem('tenku_key')}catch(e){} $('app').hidden=true; $('who').hidden=true; $('login').hidden=false; }
+$('logout').onclick=logout;
+$('login').addEventListener('submit',async e=>{ e.preventDefault(); KEY=$('key').value.trim(); $('loginErr').hidden=true;
+  try{ await start(); try{sessionStorage.setItem('tenku_key',KEY)}catch(e){} $('key').value=''; }
+  catch(x){ $('loginErr').textContent=x.message; $('loginErr').hidden=false; } });
+async function start(){
+  const me=await call('me');
+  $('roleName').textContent=me.role==='operator'?'運営者（照櫟VorDX）':'販売者（富山商会）';
+  $('login').hidden=true; $('app').hidden=false; $('who').hidden=false;
+  loadOrders();
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+  document.querySelectorAll('.panel').forEach(p=>p.hidden=p.dataset.panel!==b.dataset.tab);
+  ({orders:loadOrders,products:loadProducts,news:loadNews,report:loadReport})[b.dataset.tab]();
+});
+
+/* ---- 注文 ---- */
+async function loadOrders(){
+  const box=$('orders'); box.innerHTML='<p class="empty">読み込んでいます…</p>';
+  const f=$('fStatus').value;
+  try{
+    let {orders}=await call('orders',f&&f!=='todo'?{status:f}:{});
+    if(f==='todo') orders=orders.filter(o=>['received','paid'].includes(o.status));
+    if(!orders.length){ box.innerHTML='<p class="empty">該当する注文はありません。</p>'; return; }
+    box.innerHTML=''; orders.forEach(o=>box.appendChild(orderCard(o)));
+  }catch(x){ box.innerHTML='<p class="k-err">'+esc(x.message)+'</p>'; }
+}
+function orderCard(o){
+  const c=o.customer||{}, d=new Date(o.created_at);
+  const el=document.createElement('article'); el.className='ord'+(o.test?' test':'');
+  el.innerHTML=`<div>
+      <h3>${esc(o.order_no)} <span class="chip st-${o.status}">${ST[o.status]||o.status}</span>${o.test?'<span class="chip" style="background:var(--chip)">テスト</span>':''}</h3>
+      <div class="meta">${d.toLocaleString('ja-JP')}・${PAY[o.pay_method]||o.pay_method}${o.shipped_at?'・発送 '+new Date(o.shipped_at).toLocaleDateString('ja-JP'):''}${o.tracking?'・伝票 '+esc(o.tracking):''}</div>
+      <ul>${(o.items||[]).map(i=>`<li>${esc(i.name)} × ${i.q}</li>`).join('')}</ul>
+      <div class="tot">お支払い ${yen(o.total)}${o.discount?`（わりびき −${yen(o.discount)}）`:''}</div>
+    </div>
+    <div class="addr"><b>${esc(c.name)}</b>（${esc(c.kana)}）様<br>〒${esc(c.zip)} ${esc(c.addr)}<br>電話 ${esc(c.tel)}<br>${esc(c.mail)}<br>配達希望：${esc(c.time||'指定なし')}${o.note?'<br>備考：'+esc(o.note):''}</div>
+    <div class="acts"></div>`;
+  const acts=el.querySelector('.acts');
+  const btn=(label,cls,fn)=>{ const b=document.createElement('button'); b.type='button'; b.className='k-btn '+(cls||''); b.textContent=label; b.onclick=fn; acts.appendChild(b); return b; };
+  const upd=async(status,extra={})=>{ try{ await call('order_update',{order_no:o.order_no,status,...extra}); toast('「'+ST[status]+'」にしました'); loadOrders(); }catch(x){ toast(x.message); } };
+  if(o.status==='received'&&o.pay_method==='bank') btn('入金を確認した','',()=>upd('paid'));
+  if(o.status==='paid'||(o.status==='received'&&o.pay_method==='cod')){
+    const t=document.createElement('input'); t.placeholder='伝票番号（任意）'; t.setAttribute('aria-label','伝票番号'); acts.appendChild(t);
+    btn('発送済みにする','solid',()=>upd('shipped',{tracking:t.value.trim()}));
+  }
+  if(['pending','received','paid'].includes(o.status)){
+    let armed=false; const b=btn('キャンセル','warn',()=>{ if(!armed){ armed=true; b.textContent='もう一度押すと取り消します'; setTimeout(()=>{armed=false;b.textContent='キャンセル';},3000); return; } upd('canceled'); });
+  }
+  if(!acts.children.length) acts.innerHTML='<span class="fine">対応は完了しています</span>';
+  return el;
+}
+$('fStatus').onchange=loadOrders; $('reload').onclick=loadOrders;
+
+/* ---- 商品 ---- */
+async function loadProducts(){
+  const tb=$('prows'); tb.innerHTML='<tr><td colspan="6">読み込んでいます…</td></tr>';
+  try{
+    const {products}=await call('products'); tb.innerHTML='';
+    products.forEach(p=>{ const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${esc(p.name)}</td><td><input type="number" min="1" step="1" value="${p.price}" aria-label="${esc(p.name)}の価格"></td>
+        <td><input type="checkbox" ${p.tentative?'checked':''} aria-label="仮の価格"></td><td><input type="checkbox" ${p.sold_out?'checked':''} aria-label="売り切れ"></td>
+        <td><input type="checkbox" ${p.active?'checked':''} aria-label="サイトに表示"></td><td><button type="button" class="k-btn">保存</button></td>`;
+      const [price,tent,sold,act]=tr.querySelectorAll('input');
+      tr.querySelector('button').onclick=async()=>{ try{ await call('product_update',{sku:p.sku,price:+price.value,tentative:tent.checked,sold_out:sold.checked,active:act.checked}); toast('保存しました'); }catch(x){ toast(x.message); } };
+      tb.appendChild(tr); });
+  }catch(x){ tb.innerHTML='<tr><td colspan="6" class="k-err">'+esc(x.message)+'</td></tr>'; }
+}
+
+/* ---- お知らせ ---- */
+async function loadNews(){
+  const box=$('newsList'); box.innerHTML='<p class="empty">読み込んでいます…</p>';
+  try{
+    const {news}=await call('news'); box.innerHTML='';
+    if(!news.length){ box.innerHTML='<p class="empty">お知らせはまだありません。</p>'; return; }
+    news.forEach(n=>{ const el=document.createElement('div'); el.className='nitem';
+      el.innerHTML=`<p>${esc(n.body)}<br><span class="d">${new Date(n.created_at).toLocaleDateString('ja-JP')}・${n.published?'公開中':'非公開'}</span></p><div class="b"></div>`;
+      const b=el.querySelector('.b');
+      const t=document.createElement('button'); t.type='button'; t.className='k-btn'; t.textContent=n.published?'非公開にする':'公開する';
+      t.onclick=async()=>{ try{ await call('news_update',{id:n.id,published:!n.published}); loadNews(); }catch(x){ toast(x.message); } };
+      const d=document.createElement('button'); d.type='button'; d.className='k-btn warn'; d.textContent='削除'; let armed=false;
+      d.onclick=async()=>{ if(!armed){ armed=true; d.textContent='もう一度押すと削除'; setTimeout(()=>{armed=false;d.textContent='削除';},3000); return; }
+        try{ await call('news_delete',{id:n.id}); toast('削除しました'); loadNews(); }catch(x){ toast(x.message); } };
+      b.append(t,d); box.appendChild(el); });
+  }catch(x){ box.innerHTML='<p class="k-err">'+esc(x.message)+'</p>'; }
+}
+$('newsAdd').onclick=async()=>{ const v=$('newsBody').value.trim(); if(!v){ toast('本文を入力してください'); return; }
+  try{ await call('news_add',{body:v}); $('newsBody').value=''; toast('追加しました'); loadNews(); }catch(x){ toast(x.message); } };
+
+/* ---- 売上と手数料 ---- */
+const now=new Date(); $('rMonth').value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+$('rMonth').onchange=loadReport;
+async function loadReport(){
+  try{
+    const {orders}=await call('orders',{month:$('rMonth').value});
+    const ok=orders.filter(o=>['received','paid','shipped'].includes(o.status));
+    const sum=(l,k)=>l.reduce((a,o)=>a+(+o[k]||0),0);
+    $('rCount').textContent=ok.length+'件'; $('rTotal').textContent=yen(sum(ok,'total'));
+    $('rFee').textContent=yen(sum(ok,'platform_fee')); $('rSeller').textContent=yen(sum(ok,'seller_amount'));
+    $('rrows').innerHTML=['card','bank','cod'].map(p=>{ const l=ok.filter(o=>o.pay_method===p);
+      return `<tr><td>${PAY[p]}</td><td>${l.length}件</td><td>${yen(sum(l,'total'))}</td><td class="feeval">${yen(sum(l,'platform_fee'))}</td><td>${p==='card'?'決済時に自動で分配':'月末に請求'}</td></tr>`; }).join('');
+  }catch(x){ toast(x.message); }
+}
+
+if(KEY) start().catch(()=>logout());
+})();
+</script>
+</body>
+</html>
